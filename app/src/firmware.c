@@ -1,12 +1,29 @@
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/gpio.h>
+#include <libopencm3/cm3/systick.h>
+#include <libopencm3/cm3/vector.h>
 
 #define LED_PORT (GPIOA)
 #define LED_PIN  (GPIO5)
 
+#define CPU_FREQ (180000000)
+#define SYSTICK_FREQ (1000)
+
+volatile uint64_t ticks = 0; 
+// volatile aqui é importante pq assim o compilar nao vai tentar otimizar esse codigo
+// como sys_tick_handler é chamada por uma interrupção e nao por codigo, o compilador vai achar que
+// essa variavel e essa função nao sao chamadas e pode acabar nao declarando nada disso afim de otimizar o codigo
+// e nao é isso que queremos nesse caso
+void sys_tick_handler(void) {
+  ticks++;
+}
+
+static uint64_t get_ticks(void) {
+  return ticks;
+}
 
 static void rcc_setup(void) {
-  rcc_clock_setup_pll(&rcc_hsi_configs[RCC_CLOCK_3V3_84MHZ]);
+  rcc_clock_setup_pll(&rcc_hsi_configs[RCC_CLOCK_3V3_180MHZ]);
 }
 
 static void gpio_setup(void) {
@@ -14,19 +31,24 @@ static void gpio_setup(void) {
   gpio_mode_setup(LED_PORT, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, LED_PIN);
 }
 
-static void delay_cycles(uint32_t cycles) {
-  for (uint32_t i = 0; i < cycles; i++) {
-    __asm__("nop"); // escrevendo em assembly pra não fazer nada
-  }
+static void systick_setup(void) {
+  systick_set_frequency(SYSTICK_FREQ, CPU_FREQ);
+  systick_counter_enable();
+  systick_interrupt_enable();
 }
 
 int main(void) {
   rcc_setup();
   gpio_setup();
+  systick_setup();
+
+  uint64_t start_time = get_ticks();
 
   while (1) {
-    gpio_toggle(LED_PORT, LED_PIN);
-    delay_cycles(84000000 / 4); // mais ou menos 1 segundo
+    if (get_ticks() - start_time >= 1500) {
+      gpio_toggle(LED_PORT, LED_PIN);
+      start_time = get_ticks();
+    }
   }
 
   // Never return

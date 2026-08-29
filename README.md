@@ -58,7 +58,7 @@ git clone --recursive https://github.com/aluisioalves123/bare-metal-stm32f446re.
 | Ep | Tema | Status |
 |---|---|:---:|
 | 1 | RCC via PLL + blinky | ✅ |
-| 2 | SysTick | ⬜ |
+| 2 | SysTick | ✅ |
 | 3 | Timer / PWM | ⬜ |
 | 4 | Separação bootloader / aplicação | ⬜ |
 | 5 | Driver de UART | ⬜ |
@@ -108,3 +108,50 @@ gpio_mode_setup(LED_PORT, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, LED_PIN);
   — o que não acontece com a HAL da ST.
 
 **Resultado:** 1812 bytes (1800 text + 12 data), gravado por SWD, verify OK.
+
+### Episódio 2 — SysTick: trocando espera ocupada por interrupção
+
+O blink do episódio 1 prendia a CPU num laço de `nop`. Agora um timer de
+hardware avisa a cada 1 ms e o `main` só consulta um contador — o LED pisca
+a cada 1,5 s.
+
+```c
+volatile uint64_t ticks = 0;
+
+void sys_tick_handler(void) {
+  ticks++;
+}
+```
+
+**O que ficou claro:**
+
+- **Saí de _nenhuma_ interrupção para interrupções.** No episódio 1 a CPU
+  ficava 100% ocupada contando `nop` — não dava pra fazer mais nada enquanto
+  esperava. O SysTick dispara uma exceção 1000×/s, o processador larga o que
+  estava fazendo, incrementa o contador e volta. É isso que vai permitir,
+  mais pra frente, piscar o LED **e** atender a UART ao mesmo tempo.
+
+- **`volatile` não protege o handler, protege o laço.** O `sys_tick_handler`
+  nunca seria descartado: ele é referenciado pela tabela de vetores. O risco
+  real está no `while` do `main` — nada dentro dele escreve em `ticks`, então
+  o compilador leria a variável uma vez, guardaria num registrador e
+  compararia sempre o mesmo valor. O LED nunca piscaria. `volatile` obriga a
+  reler da memória a cada acesso.
+
+- **Os 8 bytes de `.bss` são o `ticks`.** E quem zera isso antes do `main` é o
+  `reset_handler` — o mesmo contrato com o linker script que apareceu no
+  episódio 1, agora com uma consequência visível.
+
+**Adaptação da placa:** troquei `RCC_CLOCK_3V3_84MHZ` por
+`RCC_CLOCK_3V3_180MHZ`, já que a F446 vai bem além dos 84 MHz da F401 usada
+no curso.
+
+> ⚠️ **Pendência conhecida:** o `rcc_clock_setup_pll` da libopencm3 configura
+> VOS scale, PLL e 5 wait states de flash, mas **não habilita o overdrive
+> mode** — os bits `ODEN`/`ODSWEN` do `PWR_CR` não são escritos em lugar
+> nenhum da biblioteca. O reference manual do F446 exige overdrive acima de
+> **168 MHz**, então o chip está rodando fora de especificação. Funciona na
+> bancada, mas não é garantido em temperatura ou tensão de canto. A resolver:
+> ou cair para `RCC_CLOCK_3V3_168MHZ`, ou habilitar o overdrive na mão.
+
+**Resultado:** 1976 text + 12 data + 8 bss.
