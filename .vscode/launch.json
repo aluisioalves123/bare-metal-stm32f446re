@@ -1,0 +1,49 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug (ST-Link on-board)",
+            "type": "cortex-debug",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "executable": "${workspaceFolder}/app/firmware.elf",
+            "servertype": "openocd",
+            "device": "STM32F446RE",
+            "searchDir": [
+                "C:/ST/STM32CubeIDE_2.2.0/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.debug.openocd_2.3.400.202606220929/resources/openocd/st_scripts"
+            ],
+            "configFiles": [
+                "interface/stlink-dap.cfg",
+                "target/stm32f4x.cfg"
+            ],
+            "svdFile": "C:/ST/STM32CubeIDE_2.2.0/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.productdb.debug_2.2.500.202605201745/resources/cmsis/STMicroelectronics_CMSIS_SVD/STM32F446.svd",
+            "runToEntryPoint": "main",
+            "preLaunchTask": "build",
+            "showDevDebugOutput": "none",
+            "openOCDLaunchCommands": [
+                "transport select dapdirect_swd"
+            ]
+        },
+        {
+            "name": "Attach (ST-Link on-board)",
+            "type": "cortex-debug",
+            "request": "attach",
+            "cwd": "${workspaceFolder}",
+            "executable": "${workspaceFolder}/app/firmware.elf",
+            "servertype": "openocd",
+            "device": "STM32F446RE",
+            "searchDir": [
+                "C:/ST/STM32CubeIDE_2.2.0/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.debug.openocd_2.3.400.202606220929/resources/openocd/st_scripts"
+            ],
+            "configFiles": [
+                "interface/stlink-dap.cfg",
+                "target/stm32f4x.cfg"
+            ],
+            "svdFile": "C:/ST/STM32CubeIDE_2.2.0/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.productdb.debug_2.2.500.202605201745/resources/cmsis/STMicroelectronics_CMSIS_SVD/STM32F446.svd",
+            "showDevDebugOutput": "none",
+            "openOCDLaunchCommands": [
+                "transport select dapdirect_swd"
+            ]
+        }
+    ]
+}

@@ -1,0 +1,27 @@
+# Build artifacts
+build/
+Debug/
+Release/
+*~
+*.o
+*.d
+*.bin
+*.elf
+*.hex
+*.srec
+*.list
+*.map
+*.su
+*.stylecheck
+generated.*.ld
+.gdb_history
+
+# IDE / OS
+.vscode/c_cpp_properties.json
+.DS_Store
+nbproject/
+.idea/
+.project
+
+# Shim local do python3 (caminho especifico desta maquina)
+tools/

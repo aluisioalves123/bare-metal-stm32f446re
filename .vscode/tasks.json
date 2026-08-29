@@ -1,0 +1,47 @@
+{
+    "version": "2.0.0",
+    "options": {
+        "shell": {
+            "executable": "C:/Program Files/Git/bin/bash.exe",
+            "args": ["-c"]
+        },
+        "env": {
+            "CUBE_GCC": "/c/ST/STM32CubeIDE_2.2.0/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.14.3.rel1.win32_1.0.100.202602081740/tools/bin",
+            "CUBE_MAKE": "/c/ST/STM32CubeIDE_2.2.0/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.make.win32_2.2.200.202604021615/tools/bin",
+            "CUBE_OOCD": "/c/ST/STM32CubeIDE_2.2.0/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.openocd.win32_2.4.500.202604080855/tools/bin",
+            "OOCD_SCRIPTS": "/c/ST/STM32CubeIDE_2.2.0/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.debug.openocd_2.3.400.202606220929/resources/openocd/st_scripts"
+        }
+    },
+    "tasks": [
+        {
+            "label": "build",
+            "detail": "Compila app/firmware.elf",
+            "type": "shell",
+            "command": "export PATH=\"$CUBE_GCC:$CUBE_MAKE:$PATH\" && make -C app && arm-none-eabi-size app/firmware.elf",
+            "group": { "kind": "build", "isDefault": true },
+            "problemMatcher": ["$gcc"]
+        },
+        {
+            "label": "clean",
+            "detail": "Limpa os artefatos da app",
+            "type": "shell",
+            "command": "export PATH=\"$CUBE_GCC:$CUBE_MAKE:$PATH\" && make -C app clean",
+            "problemMatcher": []
+        },
+        {
+            "label": "flash",
+            "detail": "Grava na placa via ST-Link (OpenOCD)",
+            "type": "shell",
+            "command": "\"$CUBE_OOCD/openocd.exe\" -s \"$OOCD_SCRIPTS\" -f interface/stlink-dap.cfg -c \"transport select dapdirect_swd\" -f target/stm32f4x.cfg -c \"program app/firmware.elf verify reset exit\"",
+            "dependsOn": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "libopencm3: build",
+            "detail": "Compila a libopencm3 para stm32/f4 (so precisa rodar uma vez)",
+            "type": "shell",
+            "command": "export PATH=\"$PWD/tools/bin:$CUBE_GCC:$CUBE_MAKE:$PATH\" && make -C libopencm3 TARGETS=stm32/f4",
+            "problemMatcher": []
+        }
+    ]
+}

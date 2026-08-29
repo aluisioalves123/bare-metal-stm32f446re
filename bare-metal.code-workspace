@@ -1,0 +1,64 @@
+{
+  "folders": [
+    {
+      "name": "Bare Metal Programming Series",
+      "path": "."
+    }
+  ],
+  "settings": {
+    // --- Editor ---
+    "editor.rulers": [80, 100],
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true,
+    "editor.renderWhitespace": "boundary",
+    "files.trimTrailingWhitespace": true,
+    "files.insertFinalNewline": true,
+    "files.eol": "\n",
+
+    // --- Tipos de arquivo tipicos de bare metal ---
+    "files.associations": {
+      "*.h": "c",
+      "*.inc": "c",
+      "*.ld": "linkerscript",
+      "*.s": "arm",
+      "*.S": "arm",
+      "*.sct": "plaintext"
+    },
+
+    // --- IntelliSense C (ajuste o compilerPath pro seu toolchain) ---
+    "C_Cpp.default.cStandard": "c11",
+    "C_Cpp.default.cppStandard": "c++17",
+    "C_Cpp.default.intelliSenseMode": "windows-gcc-arm",
+    "C_Cpp.default.compilerPath": "arm-none-eabi-gcc",
+    "C_Cpp.errorSquiggles": "enabled",
+
+    // --- Ruido de fora ---
+    "search.exclude": {
+      "**/build": true,
+      "**/Debug": true,
+      "**/Release": true,
+      "**/*.o": true,
+      "**/*.d": true
+    },
+    "files.watcherExclude": {
+      "**/build/**": true
+    },
+
+    "terminal.integrated.defaultProfile.windows": "PowerShell"
+  },
+  "extensions": {
+    "recommendations": [
+      "ms-vscode.cpptools",
+      "marus25.cortex-debug",
+      "mcu-debug.memory-view",
+      "mcu-debug.peripheral-viewer",
+      "mcu-debug.rtos-views",
+      "dan-c-underwood.arm",
+      "zixuanwang.linkerscript",
+      "ms-vscode.vscode-serial-monitor",
+      "ms-vscode.hexeditor",
+      "ms-vscode.makefile-tools",
+      "ms-vscode.cmake-tools"
+    ]
+  }
+}
