@@ -103,6 +103,17 @@ global. O estado que sobrevive entre iterações mora à vista no `main`.
 **Camadas:** `hal/` fala com hardware, `logic/` só decide, `board.h` é o único
 lugar com pino e porta, `main.c` orquestra e não conhece pino nenhum.
 
+## Projeto irmão
+
+A sinaleira construída no episódio 3 virou a base do **Aurora BCM**
+(`../Aurora BCM`, github.com/aluisioalves123/aurora-bcm), um body control module
+automotivo com especificação própria em `DIRETRIZES.md`. Os dois divergiram no
+episódio 4: aqui segue o curso, lá segue o produto.
+
+O foco dele é o Aurora. Este repositório é consultado quando uma etapa de lá
+precisa de um recurso que o curso cobre — o bootloader do episódio 4 vira a
+etapa 11 do Aurora, e a UART com ring buffer dos episódios 5 e 6 vira a etapa 05.
+
 ## Estado atual
 
 Episódios 1 e 2 concluídos (RCC + blinky, SysTick). Em cima disso, um projeto

@@ -53,6 +53,13 @@ Clonando do zero:
 git clone --recursive https://github.com/aluisioalves123/bare-metal-stm32f446re.git
 ```
 
+> **A sinaleira do episódio 3 continua em outro lugar.** Ela virou a base do
+> [Aurora BCM](https://github.com/aluisioalves123/aurora-bcm), um body control
+> module automotivo com especificação própria. A partir do episódio 4 os dois
+> caminhos divergem: aqui segue o curso, lá segue o produto. Este repositório
+> continua sendo a referência quando o projeto precisar de um recurso que o
+> curso cobre.
+
 ## Progresso
 
 | Ep | Tema | Status |
