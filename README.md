@@ -208,4 +208,22 @@ Qualquer outro botão troca de modo direto.
 
 **Resultado:** 2416 text + 12 data + 8 bss.
 
+**Estrutura do código.** Separado por camada — o que toca hardware de um
+lado, o que é decisão pura do outro:
+
+```
+app/
+├── inc/
+│   ├── board.h              mapa do hardware: o único arquivo com pinos
+│   ├── hal/                 systick.h  buttons.h  lamps.h
+│   └── logic/               turn_signal.h
+└── src/
+    ├── main.c               a casca: setup e o laço
+    ├── hal/                 systick.c  buttons.c  lamps.c
+    └── logic/               turn_signal.c
+```
+
+O `main.c` não inclui `board.h`: ele não sabe que existe PA5 nem pull-up.
+Quando a fiação virar PCB, só o `board.h` muda.
+
 **Próximo passo:** PWM para controlar a intensidade dos faróis, com rampa.

@@ -54,7 +54,11 @@ CSTD		?= -std=c99
 ###############################################################################
 # Source files
 
-OBJS		+= $(SRC_DIR)/$(BINARY).o
+OBJS		+= $(SRC_DIR)/main.o
+OBJS		+= $(SRC_DIR)/hal/systick.o
+OBJS		+= $(SRC_DIR)/hal/buttons.o
+OBJS		+= $(SRC_DIR)/hal/lamps.o
+OBJS		+= $(SRC_DIR)/logic/turn_signal.o
 
 ###############################################################################
 # C flags
