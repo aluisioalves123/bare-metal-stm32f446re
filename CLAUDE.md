@@ -83,6 +83,28 @@ Não há tags nem branches por episódio. Para consultar: `git show <commit>:<ar
 | 6 ring buffer | `02e33ec` | | 14 CBC-MAC | `b5e9ea1` |
 | 7 pacotes | `b4b111e` | | 7.3 base do fw-updater | `60949a1`, `1a93426` |
 
+## Convenções do projeto
+
+**Todo módulo habilita o que usa, por completo: porta, pino e clock.** Mesmo que
+isso repita um `rcc_periph_clock_enable` que outro módulo já fez.
+
+O motivo não é esquecimento, é acoplamento invisível. Se o `service_light`
+funcionar por causa de uma linha dentro do `buttons_setup()`, nada no código diz
+isso, nenhum compilador reclama, e a quebra aparece só na placa — meses depois,
+num commit que mexeu em botões e não tinha relação nenhuma com o LED. Habilitar
+o clock duas vezes custa um `|=` num registrador; a dependência silenciosa custa
+uma tarde de depuração.
+
+**Núcleo puro, casca imperativa.** Só as funções que traduzem pino ↔ valor tocam
+hardware (`read_buttons`, `blink_leds`, `activate_service_light`). Toda decisão é
+função pura: recebe tudo por parâmetro, devolve o resultado, não lê nem escreve
+global. O estado que sobrevive entre iterações mora à vista no `main`.
+
+**Camadas:** `hal/` fala com hardware, `logic/` só decide, `board.h` é o único
+lugar com pino e porta, `main.c` orquestra e não conhece pino nenhum.
+
 ## Estado atual
 
-Episódio 1 concluído: build, flash e debug validados na placa física.
+Episódios 1 e 2 concluídos (RCC + blinky, SysTick). Em cima disso, um projeto
+próprio de sinaleira de carro: setas, pisca-alerta e luz de serviço com rampa
+PWM via TIM2. Build, flash e debug validados na placa física.

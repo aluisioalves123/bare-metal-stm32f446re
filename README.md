@@ -226,4 +226,54 @@ app/
 O `main.c` não inclui `board.h`: ele não sabe que existe PA5 nem pull-up.
 Quando a fiação virar PCB, só o `board.h` muda.
 
-**Próximo passo:** PWM para controlar a intensidade dos faróis, com rampa.
+### Farol de trabalho com rampa PWM
+
+Ligar um farol de trabalho de estalo incomoda a vista e dá pico de corrente. O
+requisito é uma rampa de 400 ms — o que significa PWM com o valor de comparação
+subindo aos poucos, em vez de um pino ligando de uma vez.
+
+Botão B1 (PC13) liga e desliga. TIM2 canal 3 sai no PB10 em AF1, com
+`PSC = 224` e `ARR = 399`: a 180 MHz isso dá 2 kHz de PWM. A cada systick o
+`CCR3` anda um passo, para cima ou para baixo, então percorrer os 400 níveis
+leva exatamente os 400 ms pedidos — nos dois sentidos.
+
+```c
+uint32_t ccr = TIM_CCR3(TIM2);
+
+if (service_light_state == SERVICE_LIGHT_ON) {
+  if (ccr < TIM_ARR(TIM2)) { timer_set_oc_value(TIM2, TIM_OC3, ccr + 1); }
+} else {
+  if (ccr > 0)              { timer_set_oc_value(TIM2, TIM_OC3, ccr - 1); }
+}
+```
+
+**A restrição que dá o tom:** a rampa não pode travar a seta. As duas coisas
+acontecem ao mesmo tempo, cada uma na sua máquina de estados, alimentadas pela
+mesma base de tempo do SysTick. Nada de `delay` — se houvesse um, os 400 ms de
+rampa engoliriam duas piscadas.
+
+**O que ficou claro:**
+
+- **Rampa é estado, não espera.** A tentação é escrever um laço que sobe o duty
+  e dorme entre os passos. Isso funcionaria, e mataria o pisca-alerta. Guardar a
+  posição da rampa e avançar um passo por tick é o que deixa as duas
+  funcionalidades coexistirem num único fluxo.
+
+- **O `CCR` é o próprio contador da rampa.** Não precisei de variável para
+  guardar em que ponto a rampa está: o valor já vive no registrador do
+  periférico, e o `ARR` também. Um estado a menos para sincronizar.
+
+- **Cada módulo habilita o que usa, por completo.** O `service_light_setup()`
+  liga o clock do GPIOB mesmo o `buttons_setup()` já tendo ligado. Repetir custa
+  um `|=`; depender em silêncio de outro módulo custa uma tarde de depuração
+  quando alguém mexer nos botões.
+
+- **`timer_enable_oc_preload` evita pulso torto.** Sem ele, escrever no `CCR` no
+  meio de um ciclo trunca o pulso em curso. Com preload, o valor novo só entra
+  em vigor no próximo update do timer.
+
+**Resultado:** 3784 text + 12 data + 8 bss. Farol acendendo e apagando
+suavemente enquanto a seta pisca sem hesitar.
+
+**Próximo passo:** episódio 3 do curso — timers, PWM, cálculo de prescaler e
+período.

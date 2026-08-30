@@ -21,4 +21,7 @@
 #define HAZARD_BUTTON_PORT            (GPIOA)
 #define HAZARD_BUTTON_PIN             (GPIO9)
 
+#define SERVICE_LIGHT_BUTTON_PORT     (GPIOC)
+#define SERVICE_LIGHT_BUTTON_PIN      (GPIO13)
+
 #endif // INC_BOARD_H
