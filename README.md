@@ -156,12 +156,13 @@ no curso.
 
 **Resultado:** 1976 text + 12 data + 8 bss.
 
----
+### Episódio 3 — Timer / PWM: sinaleira de carro
 
-### Projeto próprio — sinaleira de carro
+O exercício do episódio, construído em cima da base de SysTick do episódio 2:
+um conjunto de setas com pisca-alerta, fechando com um farol de trabalho em
+PWM.
 
-Primeira coisa construída fora do roteiro do curso, em cima da base de SysTick
-do episódio 2: um conjunto de setas com pisca-alerta.
+#### Setas e pisca-alerta
 
 **Hardware:** 3 botões (direita, esquerda, pisca-alerta) em portas diferentes,
 todos com pull-up interno e aterrados pelo botão — ativos em baixo. 2 LEDs
@@ -208,7 +209,9 @@ Qualquer outro botão troca de modo direto.
 
 **Resultado:** 2416 text + 12 data + 8 bss.
 
-**Estrutura do código.** Separado por camada — o que toca hardware de um
+#### Estrutura do código
+
+Separado por camada — o que toca hardware de um
 lado, o que é decisão pura do outro:
 
 ```
@@ -226,13 +229,7 @@ app/
 O `main.c` não inclui `board.h`: ele não sabe que existe PA5 nem pull-up.
 Quando a fiação virar PCB, só o `board.h` muda.
 
-### Episódio 3 — Timer / PWM
-
-Feito direto no projeto da sinaleira, em vez de num exemplo separado: TIM2 em
-PWM modo 1, cálculo de prescaler e período, e o canal saindo num pino em função
-alternativa. Está descrito logo abaixo.
-
-### Farol de trabalho com rampa PWM
+#### Farol de trabalho com rampa PWM
 
 Ligar um farol de trabalho de estalo incomoda a vista e dá pico de corrente. O
 requisito é uma rampa de 400 ms — o que significa PWM com o valor de comparação
