@@ -59,7 +59,7 @@ git clone --recursive https://github.com/aluisioalves123/bare-metal-stm32f446re.
 |---|---|:---:|
 | 1 | RCC via PLL + blinky | ✅ |
 | 2 | SysTick | ✅ |
-| 3 | Timer / PWM | ⬜ |
+| 3 | Timer / PWM | ✅ |
 | 4 | Separação bootloader / aplicação | ⬜ |
 | 5 | Driver de UART | ⬜ |
 | 6 | Ring buffer | ⬜ |
@@ -226,6 +226,12 @@ app/
 O `main.c` não inclui `board.h`: ele não sabe que existe PA5 nem pull-up.
 Quando a fiação virar PCB, só o `board.h` muda.
 
+### Episódio 3 — Timer / PWM
+
+Feito direto no projeto da sinaleira, em vez de num exemplo separado: TIM2 em
+PWM modo 1, cálculo de prescaler e período, e o canal saindo num pino em função
+alternativa. Está descrito logo abaixo.
+
 ### Farol de trabalho com rampa PWM
 
 Ligar um farol de trabalho de estalo incomoda a vista e dá pico de corrente. O
@@ -275,5 +281,5 @@ rampa engoliriam duas piscadas.
 **Resultado:** 3784 text + 12 data + 8 bss. Farol acendendo e apagando
 suavemente enquanto a seta pisca sem hesitar.
 
-**Próximo passo:** episódio 3 do curso — timers, PWM, cálculo de prescaler e
-período.
+**Próximo passo:** episódio 4 do curso — separação entre bootloader e
+aplicação.
