@@ -155,3 +155,57 @@ no curso.
 > ou cair para `RCC_CLOCK_3V3_168MHZ`, ou habilitar o overdrive na mão.
 
 **Resultado:** 1976 text + 12 data + 8 bss.
+
+---
+
+### Projeto próprio — sinaleira de carro
+
+Primeira coisa construída fora do roteiro do curso, em cima da base de SysTick
+do episódio 2: um conjunto de setas com pisca-alerta.
+
+**Hardware:** 3 botões (direita, esquerda, pisca-alerta) em portas diferentes,
+todos com pull-up interno e aterrados pelo botão — ativos em baixo. 2 LEDs
+como faróis.
+
+**Comportamento.** Os LEDs ficam acesos em repouso, como luz de posição. Um
+aperto liga o modo e ele fica travado; apertar o mesmo botão de novo desliga.
+Qualquer outro botão troca de modo direto.
+
+| Estado | Esquerdo | Direito |
+|---|---|---|
+| `SIGNAL_OFF` | aceso | aceso |
+| `SIGNAL_RIGHT` | aceso | pisca |
+| `SIGNAL_LEFT` | pisca | aceso |
+| `SIGNAL_HAZARD` | pisca | pisca |
+
+**O que ficou claro:**
+
+- **Debounce e borda resolvem problemas diferentes, e os dois são
+  necessários.** O debounce (20 scans seguidos) filtra o repique mecânico do
+  contato. A detecção de borda garante que um aperto vale um comando, por mais
+  tempo que o dedo fique no botão — sem ela, segurar meio segundo dispararia
+  ~500 trocas de estado.
+
+- **Borda de subida no software é borda de descida no fio.** Com pull-up, o
+  pino cai de 3,3 V para GND quando o botão fecha. O `gpio_get(...) == 0` do
+  `read_buttons` inverte isso, e dali pra dentro do programa apertar é uma
+  transição `false → true`. A polaridade do hardware morre numa linha só: se um
+  dia o botão virar pull-down, muda o `== 0` para `!= 0` e mais nada no
+  programa fica sabendo.
+
+- **Núcleo puro, casca imperativa.** As únicas funções que tocam hardware são
+  `read_buttons` e `blink_leds`, e elas só traduzem — pino para `bool` e
+  `bool` para pino. Toda a decisão (`next_debounce`, `debounced_buttons`,
+  `next_signal_state`, `which_leds_blink`) é pura: recebe tudo por parâmetro e
+  devolve o resultado. O estado que sobrevive entre iterações mora visível no
+  `main`, não escondido em globais.
+
+  A prova mais direta disso é a `.bss`: **8 bytes**, que são só o contador do
+  SysTick. Nenhuma outra variável precisa de memória estática.
+
+- **O `main` virou o roteiro.** Dá pra ler o programa de cima pra baixo, cada
+  linha alimentando a próxima, sem caçar global pelo arquivo.
+
+**Resultado:** 2416 text + 12 data + 8 bss.
+
+**Próximo passo:** PWM para controlar a intensidade dos faróis, com rampa.

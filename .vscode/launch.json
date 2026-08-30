@@ -22,7 +22,11 @@
             "showDevDebugOutput": "none",
             "openOCDLaunchCommands": [
                 "transport select dapdirect_swd"
-            ]
+            ],
+            "liveWatch": {
+                "enabled": true,
+                "samplesPerSecond": 4
+            }
         },
         {
             "name": "Attach (ST-Link on-board)",
@@ -43,7 +47,11 @@
             "showDevDebugOutput": "none",
             "openOCDLaunchCommands": [
                 "transport select dapdirect_swd"
-            ]
+            ],
+            "liveWatch": {
+                "enabled": true,
+                "samplesPerSecond": 4
+            }
         }
     ]
 }
